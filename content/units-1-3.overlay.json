@@ -1,0 +1,53 @@
+{
+ "m1": {"title":"What AI Is","lessons":[
+  {"id":"u1l1","title":"What a model is","steps":[
+   {"type":"explain","title":"A prediction engine","text":"An AI model is a prediction engine trained on a huge amount of text (and often images, audio and video). You give it input, and it predicts the most useful continuation, one small piece at a time.","diagram":["Your prompt + files","Model predicts piece by piece","Answer"]},
+   {"type":"explain","title":"Your mental model","text":"Treat it like a brilliant, fast new hire who has read everything but knows nothing about you. Your job is to brief it."},
+   {"type":"choice","question":"What does a model actually do with your prompt?","options":["Looks the answer up in a database","Predicts the most useful continuation, piece by piece","Copies a human's reply"],"answer":1,"explain":"It predicts, which is why it can sound sure and still be wrong."},
+   {"type":"trueFalse","statement":"A model already knows about your business and goals.","answer":false,"explain":"It knows nothing about you until you brief it."}]},
+  {"id":"u1l2","title":"Tokens & context","steps":[
+   {"type":"explain","title":"Tokens","text":"A token is a chunk of text, roughly ¾ of a word. Usage limits and API prices are counted in tokens, e.g. \"$2 per 1M tokens in\"."},
+   {"type":"explain","title":"Context window","text":"The context window is how much the model can \"see\" at once: your prompt, the chat so far and any files. Bigger windows fit whole books or codebases."},
+   {"type":"choice","question":"Roughly what is a token?","options":["A login password","A chunk of text, about ¾ of a word","One full sentence"],"answer":1,"explain":"Prices and limits are counted in tokens."},
+   {"type":"trueFalse","statement":"If you paste a 300-page PDF, you can assume the model read every line carefully.","answer":false,"explain":"Ask about specific sections instead."}]},
+  {"id":"u1l3","title":"Words people use","steps":[
+   {"type":"explain","title":"Hallucination","text":"A confident answer that is simply wrong or made up. Always ask for sources and check the numbers that matter."},
+   {"type":"explain","title":"Reasoning, multimodal, open weights","text":"Reasoning mode thinks step by step first: slower, better on hard problems. Multimodal means it takes or makes images, audio or video. Open weights are models you can download and run yourself."},
+   {"type":"match","prompt":"Match each word to its meaning","pairs":[["Hallucination","A confident but wrong answer"],["Reasoning mode","Thinks step by step before answering"],["Multimodal","Handles images, audio or video too"],["Open weights","A model you can run yourself"]]},
+   {"type":"choice","question":"When is reasoning mode worth the wait?","options":["Fixing a typo","Planning a multi-step project or tricky math","Saying hello"],"answer":1,"explain":"Reasoning helps on hard, multi-step problems."}]},
+  {"id":"u1l4","title":"Try it: context window","handoffFromTryit":true},
+  {"id":"u1check","title":"Unit check","unitCheck":true}
+ ]},
+ "m2": {"title":"The Model Map","lessons":[
+  {"id":"u2l1","title":"Chat, reasoning & media models","steps":[
+   {"type":"explain","title":"One main assistant","text":"You don't need every model. You need one main assistant, plus a sense of which specialist to grab for images, video or voice."},
+   {"type":"explain","title":"Specialists","text":"Media tools are specialists: image models for thumbnails and product shots, video models for ads and shorts, voice models for narration and voice agents."},
+   {"type":"trueFalse","statement":"A good starting move is paying for three $20 plans on day one.","answer":false,"explain":"Start free, upgrade the one you hit limits on daily."}]},
+  {"id":"u2l2","title":"Who makes what","steps":[
+   {"type":"explain","title":"The big families (checked Oct 14, 2026)","text":"Grok: coding, agents, live X/web search and news. Claude: writing, long documents, coding agents. GPT/ChatGPT: everyday all-rounder and image generation. Gemini: Google Workspace, 1M context, research. Open weights (Qwen, DeepSeek, Gemma…): privacy, running locally, low cost at volume.","note":"Prices and names change weekly. Re-check before you buy."},
+   {"type":"match","prompt":"Match the family to what it's best at","pairs":[["Grok","Live X and web news"],["Claude","Writing and long documents"],["Gemini","Google apps and huge docs"],["Open weights","Private, local use"]]},
+   {"type":"trueFalse","statement":"Sora is still the best video model to start with.","answer":false,"explain":"Sora was shut down in 2026 (app Apr 26, API Sep 24)."}]},
+  {"id":"u2l3","title":"Picking one","steps":[
+   {"type":"explain","title":"Quick picker","text":"Writing & long docs → Claude. Live news & X → Grok. Google apps & huge docs → Gemini. All-rounder → ChatGPT. Private / local → open weights. Bulk cheap steps → small fast models like Haiku, Luna or DeepSeek Flash."},
+   {"type":"choice","question":"You want news from the last 24 hours on X. Which family is strongest?","options":["Grok","Open weights running offline","Midjourney"],"answer":0,"explain":"Live X/web search is Grok's differentiator."},
+   {"type":"choice","question":"Privacy-sensitive data that must stay on your machine?","options":["A video model","Open-weights models run locally","Any free chatbot"],"answer":1,"explain":"Open weights can run on your own hardware."}]},
+  {"id":"u2l4","title":"Try it: side by side","handoffFromTryit":true},
+  {"id":"u2check","title":"Unit check","unitCheck":true}
+ ]},
+ "m3": {"title":"Prompting","lessons":[
+  {"id":"u3l1","title":"Vague → directed","steps":[
+   {"type":"explain","title":"Four parts of a good prompt","text":"Most \"AI is bad\" moments are briefing problems.","diagram":["Role & goal","Context","Examples","Format"]},
+   {"type":"spotBetter","question":"Which prompt will get a better caption?","a":"Write an Instagram caption for my bakery.","b":"You're a social media copywriter for a small Portland bakery. Goal: pre-orders of pumpkin croissants for Saturday. Write 3 captions under 40 words, max 2 emojis, ending with \"Pre-order via link in bio\".","better":1,"explain":"Role, goal, audience and format beat a one-liner."},
+   {"type":"order","prompt":"Put the fix-it loop in order","items":["Draft","Say exactly what's wrong","Ask for 3 variations","Keep the rule for next time"]}]},
+  {"id":"u3l2","title":"Numbers, not adjectives","steps":[
+   {"type":"explain","title":"Adjectives are where the default look lives","text":"Replace \"nice\", \"premium\", \"engaging\" with counts, sizes, angles, word limits and examples."},
+   {"type":"spotBetter","question":"Which product-photo prompt is stronger?","a":"Product shot of a matte black bottle on wet slate. 85mm, eye level, f/2.8, bottle fills 60% of frame. One softbox 45° left, warm rim light. 4:5, no text.","b":"Make my product photo look premium and cinematic.","better":0,"explain":"Concrete numbers remove guesswork."},
+   {"type":"choice","question":"Which change improves a prompt most?","options":["Adding 'please'","Replacing adjectives with concrete numbers and an example","Writing in all caps"],"answer":1,"explain":"Specifics beat vibes."}]},
+  {"id":"u3l3","title":"Fix the prompt","steps":[
+   {"type":"explain","title":"Build it up","text":"A weak prompt gets strong when you add a role, a goal, constraints and a format. Examples lock the style."},
+   {"type":"fixPrompt","base":"Write a product description for my candle.","chips":[{"label":"Role","text":"You are a copywriter for an eco home brand.","correct":true},{"label":"Goal","text":"Goal: get Etsy shoppers to add it to cart.","correct":true},{"label":"Format","text":"Under 80 words, 3 bullet benefits.","correct":true},{"label":"ALL CAPS","text":"MAKE IT REALLY GOOD!!!","correct":false}],"explain":"Role, goal and format help. Shouting doesn't."},
+   {"type":"choice","question":"The draft is too long and too formal. Best follow-up?","options":["'Make it better'","'Cut to 50 words, casual tone, like this example: …'","Start a new chat with the same prompt"],"answer":1,"explain":"Name the exact problem and the target."}]},
+  {"id":"u3l4","title":"Try it: the template","handoffFromTryit":true},
+  {"id":"u3check","title":"Unit check","unitCheck":true}
+ ]}
+}

@@ -1,0 +1,20 @@
+{
+  "identifier" : "B07CA4E0",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : true,
+      "internalID" : "6700000001",
+      "localizations" : [
+        { "description" : "Unlock every Botcamp unit beyond the free basics.", "displayName" : "Botcamp Pro", "locale" : "en_US" }
+      ],
+      "productID" : "com.pak209.botcamp.pro",
+      "referenceName" : "Botcamp Pro (one-time)",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {},
+  "subscriptionGroups" : [],
+  "version" : { "major" : 3, "minor" : 0 }
+}

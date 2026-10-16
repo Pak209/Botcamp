@@ -1,0 +1,908 @@
+{
+ "version": 1,
+ "lastChecked": "Oct 14, 2026",
+ "generatedFrom": "get-up-to-speed/content.js",
+ "rungs": [
+  {
+   "title": "Chat",
+   "detail": "One-off questions with good context",
+   "unitId": "m3"
+  },
+  {
+   "title": "Projects / GPTs / Gems",
+   "detail": "Saved instructions + files for repeat work",
+   "unitId": "m4"
+  },
+  {
+   "title": "Agents",
+   "detail": "The model uses tools for multi-step tasks",
+   "unitId": "m6"
+  },
+  {
+   "title": "Coding agents",
+   "detail": "Build apps and sites by describing them",
+   "unitId": "m7"
+  },
+  {
+   "title": "Automations",
+   "detail": "Triggers → AI step → action, on autopilot",
+   "unitId": "m8"
+  },
+  {
+   "title": "Subagent teams",
+   "detail": "An orchestrator splits work across specialists",
+   "unitId": "m9"
+  }
+ ],
+ "units": [
+  {
+   "id": "m1",
+   "number": 1,
+   "title": "What AI Is",
+   "subtitle": "What AI models are (and the words people use)",
+   "blurb": "Tokens, context, hallucination, reasoning modes, in plain English.",
+   "rung": 0,
+   "isFree": true,
+   "isStub": false,
+   "lessons": [
+    {
+     "xp": 10,
+     "id": "u1l1",
+     "title": "What a model is",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "A prediction engine",
+       "text": "An AI model is a prediction engine trained on a huge amount of text (and often images, audio and video). You give it input, and it predicts the most useful continuation, one small piece at a time.",
+       "diagram": [
+        "Your prompt + files",
+        "Model predicts piece by piece",
+        "Answer"
+       ]
+      },
+      {
+       "type": "explain",
+       "title": "Your mental model",
+       "text": "Treat it like a brilliant, fast new hire who has read everything but knows nothing about you. Your job is to brief it."
+      },
+      {
+       "type": "choice",
+       "question": "What does a model actually do with your prompt?",
+       "options": [
+        "Looks the answer up in a database",
+        "Predicts the most useful continuation, piece by piece",
+        "Copies a human's reply"
+       ],
+       "answer": 1,
+       "explain": "It predicts, which is why it can sound sure and still be wrong."
+      },
+      {
+       "type": "trueFalse",
+       "statement": "A model already knows about your business and goals.",
+       "answer": false,
+       "explain": "It knows nothing about you until you brief it."
+      }
+     ]
+    },
+    {
+     "xp": 10,
+     "id": "u1l2",
+     "title": "Tokens & context",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Tokens",
+       "text": "A token is a chunk of text, roughly ¾ of a word. Usage limits and API prices are counted in tokens, e.g. \"$2 per 1M tokens in\"."
+      },
+      {
+       "type": "explain",
+       "title": "Context window",
+       "text": "The context window is how much the model can \"see\" at once: your prompt, the chat so far and any files. Bigger windows fit whole books or codebases."
+      },
+      {
+       "type": "choice",
+       "question": "Roughly what is a token?",
+       "options": [
+        "A login password",
+        "A chunk of text, about ¾ of a word",
+        "One full sentence"
+       ],
+       "answer": 1,
+       "explain": "Prices and limits are counted in tokens."
+      },
+      {
+       "type": "trueFalse",
+       "statement": "If you paste a 300-page PDF, you can assume the model read every line carefully.",
+       "answer": false,
+       "explain": "Ask about specific sections instead."
+      }
+     ]
+    },
+    {
+     "xp": 10,
+     "id": "u1l3",
+     "title": "Words people use",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Hallucination",
+       "text": "A confident answer that is simply wrong or made up. Always ask for sources and check the numbers that matter."
+      },
+      {
+       "type": "explain",
+       "title": "Reasoning, multimodal, open weights",
+       "text": "Reasoning mode thinks step by step first: slower, better on hard problems. Multimodal means it takes or makes images, audio or video. Open weights are models you can download and run yourself."
+      },
+      {
+       "type": "match",
+       "prompt": "Match each word to its meaning",
+       "pairs": [
+        [
+         "Hallucination",
+         "A confident but wrong answer"
+        ],
+        [
+         "Reasoning mode",
+         "Thinks step by step before answering"
+        ],
+        [
+         "Multimodal",
+         "Handles images, audio or video too"
+        ],
+        [
+         "Open weights",
+         "A model you can run yourself"
+        ]
+       ]
+      },
+      {
+       "type": "choice",
+       "question": "When is reasoning mode worth the wait?",
+       "options": [
+        "Fixing a typo",
+        "Planning a multi-step project or tricky math",
+        "Saying hello"
+       ],
+       "answer": 1,
+       "explain": "Reasoning helps on hard, multi-step problems."
+      }
+     ]
+    },
+    {
+     "id": "u1l4",
+     "title": "Try it: context window",
+     "xp": 20,
+     "steps": [
+      {
+       "type": "handoff",
+       "intro": "Open any free chatbot (ChatGPT, Claude, Gemini or Grok). Paste this and compare the two answers.",
+       "prompt": "Explain what a 'context window' is in 3 sentences for a 12-year-old.\n\nNow explain it again, but think step by step first and give me one everyday analogy plus one way it could trip me up.",
+       "checklist": [
+        "I pasted the prompt into my AI app",
+        "I read the whole answer",
+        "I compared it with what I expected",
+        "I noticed one thing I would change next time"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "u1check",
+     "title": "Unit check",
+     "xp": 25,
+     "isUnitCheck": true,
+     "passFraction": 0.7,
+     "steps": [
+      {
+       "type": "choice",
+       "question": "Roughly what is a token?",
+       "options": [
+        "A login password",
+        "A chunk of text, about ¾ of a word",
+        "One full sentence"
+       ],
+       "answer": 1,
+       "explain": "Prices and limits are counted in tokens."
+      },
+      {
+       "type": "choice",
+       "question": "The model gives you a confident statistic with no source. What's the right move?",
+       "options": [
+        "Use it, it sounded sure",
+        "Ask for a source and check it",
+        "Ask it to repeat louder"
+       ],
+       "answer": 1,
+       "explain": "Confident ≠ correct. That's a hallucination risk."
+      },
+      {
+       "type": "choice",
+       "question": "When is reasoning mode worth the wait?",
+       "options": [
+        "Fixing a typo",
+        "Planning a multi-step project or tricky math",
+        "Saying hello"
+       ],
+       "answer": 1,
+       "explain": "Reasoning helps on hard, multi-step problems."
+      },
+      {
+       "type": "multiSelect",
+       "question": "Which are common mistakes here?",
+       "options": [
+        "Treating answers as facts without sources.",
+        "Pasting a 300-page PDF and assuming it read every line carefully. Ask about specific sections.",
+        "Using reasoning mode for everything (slow) or never (worse on hard tasks).",
+        "Taking a short break"
+       ],
+       "answers": [
+        0,
+        1,
+        2
+       ],
+       "explain": "All of these trip up beginners."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m2",
+   "number": 2,
+   "title": "The Model Map",
+   "subtitle": "The model landscape map",
+   "blurb": "Who's best at what, and what it costs. Last checked Oct 14, 2026.",
+   "rung": 0,
+   "isFree": true,
+   "isStub": false,
+   "lessons": [
+    {
+     "xp": 10,
+     "id": "u2l1",
+     "title": "Chat, reasoning & media models",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "One main assistant",
+       "text": "You don't need every model. You need one main assistant, plus a sense of which specialist to grab for images, video or voice."
+      },
+      {
+       "type": "explain",
+       "title": "Specialists",
+       "text": "Media tools are specialists: image models for thumbnails and product shots, video models for ads and shorts, voice models for narration and voice agents."
+      },
+      {
+       "type": "trueFalse",
+       "statement": "A good starting move is paying for three $20 plans on day one.",
+       "answer": false,
+       "explain": "Start free, upgrade the one you hit limits on daily."
+      }
+     ]
+    },
+    {
+     "xp": 10,
+     "id": "u2l2",
+     "title": "Who makes what",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "The big families (checked Oct 14, 2026)",
+       "text": "Grok: coding, agents, live X/web search and news. Claude: writing, long documents, coding agents. GPT/ChatGPT: everyday all-rounder and image generation. Gemini: Google Workspace, 1M context, research. Open weights (Qwen, DeepSeek, Gemma…): privacy, running locally, low cost at volume.",
+       "note": "Prices and names change weekly. Re-check before you buy."
+      },
+      {
+       "type": "match",
+       "prompt": "Match the family to what it's best at",
+       "pairs": [
+        [
+         "Grok",
+         "Live X and web news"
+        ],
+        [
+         "Claude",
+         "Writing and long documents"
+        ],
+        [
+         "Gemini",
+         "Google apps and huge docs"
+        ],
+        [
+         "Open weights",
+         "Private, local use"
+        ]
+       ]
+      },
+      {
+       "type": "trueFalse",
+       "statement": "Sora is still the best video model to start with.",
+       "answer": false,
+       "explain": "Sora was shut down in 2026 (app Apr 26, API Sep 24)."
+      }
+     ]
+    },
+    {
+     "xp": 10,
+     "id": "u2l3",
+     "title": "Picking one",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Quick picker",
+       "text": "Writing & long docs → Claude. Live news & X → Grok. Google apps & huge docs → Gemini. All-rounder → ChatGPT. Private / local → open weights. Bulk cheap steps → small fast models like Haiku, Luna or DeepSeek Flash."
+      },
+      {
+       "type": "choice",
+       "question": "You want news from the last 24 hours on X. Which family is strongest?",
+       "options": [
+        "Grok",
+        "Open weights running offline",
+        "Midjourney"
+       ],
+       "answer": 0,
+       "explain": "Live X/web search is Grok's differentiator."
+      },
+      {
+       "type": "choice",
+       "question": "Privacy-sensitive data that must stay on your machine?",
+       "options": [
+        "A video model",
+        "Open-weights models run locally",
+        "Any free chatbot"
+       ],
+       "answer": 1,
+       "explain": "Open weights can run on your own hardware."
+      }
+     ]
+    },
+    {
+     "id": "u2l4",
+     "title": "Try it: side by side",
+     "xp": 20,
+     "steps": [
+      {
+       "type": "handoff",
+       "intro": "Run the same prompt in two free tiers side by side. Notice tone, length and whether it cites sources.",
+       "prompt": "I run a small [your business]. Give me 5 ideas to get more customers this month. Put them in a table: idea, cost, time needed, first step. Cite any statistic you use.",
+       "checklist": [
+        "I pasted the prompt into my AI app",
+        "I read the whole answer",
+        "I compared it with what I expected",
+        "I noticed one thing I would change next time"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "u2check",
+     "title": "Unit check",
+     "xp": 25,
+     "isUnitCheck": true,
+     "passFraction": 0.7,
+     "steps": [
+      {
+       "type": "choice",
+       "question": "You want news from the last 24 hours on X. Which family is strongest here?",
+       "options": [
+        "Grok",
+        "Open weights running offline",
+        "Midjourney"
+       ],
+       "answer": 0,
+       "explain": "Live X/web search is Grok's differentiator."
+      },
+      {
+       "type": "choice",
+       "question": "Which is a good fit for privacy-sensitive data you don't want to leave your machine?",
+       "options": [
+        "A video model",
+        "Open-weights models like Qwen3.8 run locally",
+        "Any free chatbot"
+       ],
+       "answer": 1,
+       "explain": "Open weights can run on your own hardware."
+      },
+      {
+       "type": "choice",
+       "question": "Sora is…",
+       "options": [
+        "The best video model",
+        "Shut down in 2026",
+        "A voice tool"
+       ],
+       "answer": 1,
+       "explain": "App closed Apr 26, API Sep 24, 2026."
+      },
+      {
+       "type": "multiSelect",
+       "question": "Which are common mistakes here?",
+       "options": [
+        "Paying for three $20 plans on day one. Start free, upgrade the one you hit limits on daily.",
+        "Assuming last year's favorite is still the best. This table changes monthly.",
+        "Using a video app that no longer exists (Sora shut down in 2026).",
+        "Taking a short break"
+       ],
+       "answers": [
+        0,
+        1,
+        2
+       ],
+       "explain": "All of these trip up beginners."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m3",
+   "number": 3,
+   "title": "Prompting",
+   "subtitle": "Prompting fundamentals",
+   "blurb": "From vague to directed: context, examples, format, and numbers instead of adjectives.",
+   "rung": 0,
+   "isFree": true,
+   "isStub": false,
+   "lessons": [
+    {
+     "xp": 10,
+     "id": "u3l1",
+     "title": "Vague → directed",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Four parts of a good prompt",
+       "text": "Most \"AI is bad\" moments are briefing problems.",
+       "diagram": [
+        "Role & goal",
+        "Context",
+        "Examples",
+        "Format"
+       ]
+      },
+      {
+       "type": "spotBetter",
+       "question": "Which prompt will get a better caption?",
+       "a": "Write an Instagram caption for my bakery.",
+       "b": "You're a social media copywriter for a small Portland bakery. Goal: pre-orders of pumpkin croissants for Saturday. Write 3 captions under 40 words, max 2 emojis, ending with \"Pre-order via link in bio\".",
+       "better": 1,
+       "explain": "Role, goal, audience and format beat a one-liner."
+      },
+      {
+       "type": "order",
+       "prompt": "Put the fix-it loop in order",
+       "items": [
+        "Draft",
+        "Say exactly what's wrong",
+        "Ask for 3 variations",
+        "Keep the rule for next time"
+       ]
+      }
+     ]
+    },
+    {
+     "xp": 10,
+     "id": "u3l2",
+     "title": "Numbers, not adjectives",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Adjectives are where the default look lives",
+       "text": "Replace \"nice\", \"premium\", \"engaging\" with counts, sizes, angles, word limits and examples."
+      },
+      {
+       "type": "spotBetter",
+       "question": "Which product-photo prompt is stronger?",
+       "a": "Product shot of a matte black bottle on wet slate. 85mm, eye level, f/2.8, bottle fills 60% of frame. One softbox 45° left, warm rim light. 4:5, no text.",
+       "b": "Make my product photo look premium and cinematic.",
+       "better": 0,
+       "explain": "Concrete numbers remove guesswork."
+      },
+      {
+       "type": "choice",
+       "question": "Which change improves a prompt most?",
+       "options": [
+        "Adding 'please'",
+        "Replacing adjectives with concrete numbers and an example",
+        "Writing in all caps"
+       ],
+       "answer": 1,
+       "explain": "Specifics beat vibes."
+      }
+     ]
+    },
+    {
+     "xp": 10,
+     "id": "u3l3",
+     "title": "Fix the prompt",
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Build it up",
+       "text": "A weak prompt gets strong when you add a role, a goal, constraints and a format. Examples lock the style."
+      },
+      {
+       "type": "fixPrompt",
+       "base": "Write a product description for my candle.",
+       "chips": [
+        {
+         "label": "Role",
+         "text": "You are a copywriter for an eco home brand.",
+         "correct": true
+        },
+        {
+         "label": "Goal",
+         "text": "Goal: get Etsy shoppers to add it to cart.",
+         "correct": true
+        },
+        {
+         "label": "Format",
+         "text": "Under 80 words, 3 bullet benefits.",
+         "correct": true
+        },
+        {
+         "label": "ALL CAPS",
+         "text": "MAKE IT REALLY GOOD!!!",
+         "correct": false
+        }
+       ],
+       "explain": "Role, goal and format help. Shouting doesn't."
+      },
+      {
+       "type": "choice",
+       "question": "The draft is too long and too formal. Best follow-up?",
+       "options": [
+        "'Make it better'",
+        "'Cut to 50 words, casual tone, like this example: …'",
+        "Start a new chat with the same prompt"
+       ],
+       "answer": 1,
+       "explain": "Name the exact problem and the target."
+      }
+     ]
+    },
+    {
+     "id": "u3l4",
+     "title": "Try it: the template",
+     "xp": 20,
+     "steps": [
+      {
+       "type": "handoff",
+       "intro": "Take something you actually need this week. Run the vague version, then this template. Compare.",
+       "prompt": "Role: You are a [expert type].\nGoal: [what \"done\" looks like].\nContext: [audience, facts, constraints].\nExample of what I like: [paste 1 sample].\nFormat: [length / bullets / table], [number] options.\nBefore answering, ask me up to 3 questions if anything important is missing.",
+       "checklist": [
+        "I pasted the prompt into my AI app",
+        "I read the whole answer",
+        "I compared it with what I expected",
+        "I noticed one thing I would change next time"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "u3check",
+     "title": "Unit check",
+     "xp": 25,
+     "isUnitCheck": true,
+     "passFraction": 0.7,
+     "steps": [
+      {
+       "type": "choice",
+       "question": "Which change improves a prompt most?",
+       "options": [
+        "Adding 'please'",
+        "Replacing adjectives with concrete numbers and an example",
+        "Writing in all caps"
+       ],
+       "answer": 1,
+       "explain": "Specifics beat vibes."
+      },
+      {
+       "type": "choice",
+       "question": "The draft is too long and too formal. Best follow-up?",
+       "options": [
+        "'Make it better'",
+        "'Cut to 50 words, casual tone, like this example: …'",
+        "Start a new chat with the same prompt"
+       ],
+       "answer": 1,
+       "explain": "Name the exact problem and the target."
+      },
+      {
+       "type": "choice",
+       "question": "Why ask the model to ask you questions first?",
+       "options": [
+        "It fills gaps in your brief before it guesses",
+        "It's polite",
+        "It uses fewer tokens"
+       ],
+       "answer": 0,
+       "explain": "It surfaces missing context."
+      },
+      {
+       "type": "multiSelect",
+       "question": "Which are common mistakes here?",
+       "options": [
+        "Asking for 'better' without saying what's wrong.",
+        "No examples, so you get the generic default style.",
+        "One giant prompt for a 10-step job. Break it into steps.",
+        "Taking a short break"
+       ],
+       "answers": [
+        0,
+        1,
+        2
+       ],
+       "explain": "All of these trip up beginners."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m4",
+   "number": 4,
+   "title": "Projects, custom GPTs and memory",
+   "subtitle": "Projects, custom GPTs and memory",
+   "blurb": "Stop re-explaining yourself. Save instructions and files once, reuse forever.",
+   "rung": 1,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m4-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Projects, custom GPTs and memory",
+       "text": "If you've pasted the same background three times, it belongs in a Project (Claude, ChatGPT), a Custom GPT, a Gem (Gemini) or a saved bot instruction.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m5",
+   "number": 5,
+   "title": "Image, video and voice tools",
+   "subtitle": "Image, video and voice tools",
+   "blurb": "Make thumbnails, product shots, short videos and narration without a studio.",
+   "rung": 1,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m5-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Image, video and voice tools",
+       "text": "Media tools are specialists. The pro workflow is to plan in a chat model, lock a hero image, then animate and voice it.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m6",
+   "number": 6,
+   "title": "Agents and computer use",
+   "subtitle": "Agents and computer use",
+   "blurb": "When the model stops just talking and starts doing: browsing, running code, using files.",
+   "rung": 2,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m6-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Agents and computer use",
+       "text": "A chatbot answers. An agent takes actions: it plans, uses tools (search, browser, code, files), checks results, and loops until done.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m7",
+   "number": 7,
+   "title": "Coding agents (no coding experience needed)",
+   "subtitle": "Coding agents (no coding experience needed)",
+   "blurb": "Build a website, tool or app by describing it, one screen at a time.",
+   "rung": 3,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m7-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Coding agents (no coding experience needed)",
+       "text": "Coding agents like Claude Code, Codex, Cursor and Grok Build write, run and fix code for you. You act as the product manager: you describe, they build, you test.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m8",
+   "number": 8,
+   "title": "Automations (n8n, Zapier, Make)",
+   "subtitle": "Automations (n8n, Zapier, Make)",
+   "blurb": "WHEN something happens, AI does a step, THEN an action. On autopilot.",
+   "rung": 4,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m8-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Automations (n8n, Zapier, Make)",
+       "text": "Automations connect your apps. A trigger fires, an AI step thinks, and an action happens, without you opening a chat.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m9",
+   "number": 9,
+   "title": "Subagent and multi-agent teams",
+   "subtitle": "Subagent and multi-agent teams",
+   "blurb": "One orchestrator, a few specialists, and a cheap model for the grunt work.",
+   "rung": 5,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m9-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Subagent and multi-agent teams",
+       "text": "A multi-agent team splits a big job across specialists, like a small agency. An orchestrator plans and hands off; each subagent has one job, its own instructions, and often a cheaper model.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "m10",
+   "number": 10,
+   "title": "Safety, privacy and cost control",
+   "subtitle": "Safety, privacy and cost control",
+   "blurb": "Keep secrets secret, keep humans in the loop, and keep the bill predictable.",
+   "rung": 5,
+   "isFree": false,
+   "isStub": true,
+   "lessons": [
+    {
+     "id": "m10-preview",
+     "title": "Preview",
+     "xp": 10,
+     "steps": [
+      {
+       "type": "explain",
+       "title": "Safety, privacy and cost control",
+       "text": "Three habits prevent almost every AI horror story.",
+       "note": "Full lessons are coming in a later update."
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Agent",
+   "definition": "A model that uses tools and takes multi-step actions toward a goal.",
+   "unitId": "m6"
+  },
+  {
+   "term": "API",
+   "definition": "A way for software to call a model directly; billed per token.",
+   "unitId": "m10"
+  },
+  {
+   "term": "Automation",
+   "definition": "A trigger → AI step → action pipeline that runs without you (n8n, Zapier, Make).",
+   "unitId": "m8"
+  },
+  {
+   "term": "Coding agent",
+   "definition": "An agent that writes, runs and fixes code (Claude Code, Codex, Cursor, Grok Build).",
+   "unitId": "m7"
+  },
+  {
+   "term": "Computer use",
+   "definition": "An agent operating a browser or desktop like a person.",
+   "unitId": "m6"
+  },
+  {
+   "term": "Context window",
+   "definition": "How much text the model can consider at once.",
+   "unitId": "m1"
+  },
+  {
+   "term": "Custom GPT / Gem / Project",
+   "definition": "A saved workspace with instructions and files.",
+   "unitId": "m4"
+  },
+  {
+   "term": "Hallucination",
+   "definition": "A confident but wrong or invented answer.",
+   "unitId": "m1"
+  },
+  {
+   "term": "Image-to-video",
+   "definition": "Animating a still image, keeping its look consistent.",
+   "unitId": "m5"
+  },
+  {
+   "term": "Memory",
+   "definition": "Facts an assistant remembers across chats.",
+   "unitId": "m4"
+  },
+  {
+   "term": "Multimodal",
+   "definition": "Works with text plus images, audio or video.",
+   "unitId": "m1"
+  },
+  {
+   "term": "Open weights",
+   "definition": "Models you can download and run yourself.",
+   "unitId": "m2"
+  },
+  {
+   "term": "Orchestrator",
+   "definition": "The agent that plans and hands work to subagents.",
+   "unitId": "m9"
+  },
+  {
+   "term": "Prompt",
+   "definition": "Your instructions to the model.",
+   "unitId": "m3"
+  },
+  {
+   "term": "Prompt injection",
+   "definition": "Hidden instructions in content an AI reads, trying to hijack it.",
+   "unitId": "m10"
+  },
+  {
+   "term": "Reasoning mode",
+   "definition": "The model thinks step by step before answering.",
+   "unitId": "m1"
+  },
+  {
+   "term": "Subagent",
+   "definition": "A specialist agent with one job inside a team.",
+   "unitId": "m9"
+  },
+  {
+   "term": "Token",
+   "definition": "A chunk of text (~¾ word); the unit of limits and pricing.",
+   "unitId": "m1"
+  }
+ ]
+}
