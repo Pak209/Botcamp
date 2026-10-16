@@ -28,7 +28,6 @@ final class CourseParsingTests: XCTestCase {
             XCTAssertTrue(u.lessons.contains { $0.isUnitCheck }, "\(u.id) needs a unit check")
             XCTAssertTrue(u.lessons.flatMap(\.steps).contains { if case .handoff = $0 { return true }; return false })
         }
-        XCTAssertTrue(c.units.dropFirst(3).allSatisfy(\.isStub))
     }
 
     func testEveryPlannedLessonTypeAppears() throws {

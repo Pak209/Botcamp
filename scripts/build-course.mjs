@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Converts ../get-up-to-speed/content.js (+ content/units-1-3.overlay.json) into Botcamp/Resources/course.json.
+// Converts ../get-up-to-speed/content.js (+ content/*.overlay.json) into Botcamp/Resources/course.json.
 // Usage: node scripts/build-course.mjs [path/to/content.js]
 import fs from 'node:fs'; import vm from 'node:vm'; import path from 'node:path'; import {fileURLToPath} from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -7,7 +7,8 @@ const src = process.argv[2] || path.resolve(root, '../get-up-to-speed/content.js
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(src, 'utf8') + '\n;globalThis.__out={MODULES,RUNGS,GLOSSARY,LAST_CHECKED};', ctx);
 const {MODULES, RUNGS, GLOSSARY, LAST_CHECKED} = ctx.__out;
-const overlay = JSON.parse(fs.readFileSync(path.join(root, 'content/units-1-3.overlay.json'), 'utf8'));
+const overlay = Object.assign({}, ...fs.readdirSync(path.join(root, 'content')).filter(f => f.endsWith('.overlay.json')).sort()
+  .map(f => JSON.parse(fs.readFileSync(path.join(root, 'content', f), 'utf8'))));
 const strip = h => h.replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 const lead = b => { const m = b.match(/<p class="lead">([\s\S]*?)<\/p>/); return m ? strip(m[1]) : ''; };
 const FREE = new Set(['m1', 'm2', 'm3']); // Dan: basics, models, prompting are free

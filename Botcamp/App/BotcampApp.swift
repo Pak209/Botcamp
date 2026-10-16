@@ -15,6 +15,6 @@ struct BotcampApp: App {
                 .task { await pro.start() }
                 .tint(.brandTeal)
         }
-        .modelContainer(for: [PlayerProfile.self, LessonRecord.self])
+        .modelContainer(for: [PlayerProfile.self, LessonRecord.self, MissedQuestion.self])
     }
 }

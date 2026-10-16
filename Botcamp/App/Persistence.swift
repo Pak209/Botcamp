@@ -9,6 +9,13 @@ final class PlayerProfile {
     var streakData: Data = Data()
     var dailyGoal: Int = 1
     var createdAt: Date = Date()
+    // v0.2 (defaults keep SwiftData's lightweight migration automatic)
+    var hasOnboarded: Bool = false
+    var goalText: String = ""
+    var playerName: String = ""
+    var remindersOn: Bool = false
+    var reminderHour: Int = 19
+    var reminderMinute: Int = 0
 
     init() {}
 
@@ -32,6 +39,16 @@ final class LessonRecord {
     }
 }
 
+/// A question missed at least once; lives until answered right in Review.
+@Model
+final class MissedQuestion {
+    var lessonId: String = ""
+    var stepIndex: Int = 0
+    var missedAt: Date = Date()
+    init(lessonId: String, stepIndex: Int, missedAt: Date = .now) { self.lessonId = lessonId; self.stepIndex = stepIndex; self.missedAt = missedAt }
+    var ref: MissedRef { MissedRef(lessonId: lessonId, stepIndex: stepIndex) }
+}
+
 enum ProgressWriter {
     static func profile(in context: ModelContext) -> PlayerProfile {
         if let p = try? context.fetch(FetchDescriptor<PlayerProfile>()).first { return p }
@@ -52,7 +69,19 @@ enum ProgressWriter {
         return xp
     }
 
+    static func recordMiss(lessonId: String, stepIndex: Int, in context: ModelContext) {
+        let existing = (try? context.fetch(FetchDescriptor<MissedQuestion>(predicate: #Predicate { $0.lessonId == lessonId && $0.stepIndex == stepIndex }))) ?? []
+        if existing.isEmpty { context.insert(MissedQuestion(lessonId: lessonId, stepIndex: stepIndex)); try? context.save() }
+    }
+
+    static func clearReviewed(_ cleared: [MissedRef], in context: ModelContext) {
+        let all = (try? context.fetch(FetchDescriptor<MissedQuestion>())) ?? []
+        let set = Set(cleared)
+        for m in all where set.contains(m.ref) { context.delete(m) }
+        try? context.save()
+    }
+
     static func todayCount(_ records: [LessonRecord], now: Date = .now) -> Int {
-        records.filter { Calendar.current.isDate($0.completedAt, inSameDayAs: now) }.count
+        records.filter { $0.lessonId != ReviewBuilder.reviewLessonId && Calendar.current.isDate($0.completedAt, inSameDayAs: now) }.count
     }
 }
