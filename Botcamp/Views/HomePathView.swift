@@ -4,6 +4,8 @@ import BotcampCore
 
 /// Duolingo-style winding path. Ladder rungs from content.js become section headers.
 struct HomePathView: View {
+    /// Set by RootTabView after onboarding: open the first lesson of the placement unit.
+    var autoStart: Binding<Bool> = .constant(false)
     @Environment(CourseStore.self) private var content
     @Environment(ProStore.self) private var pro
     @Query private var profiles: [PlayerProfile]
@@ -39,6 +41,13 @@ struct HomePathView: View {
                 LessonPlayerView(unit: content.course.units[0], lesson: t.lesson, completed: completed, reviewRefs: t.refs)
             }
             .sheet(isPresented: $showPaywall) { PaywallView() }
+            .onChange(of: autoStart.wrappedValue) { _, go in
+                guard go else { return }
+                autoStart.wrappedValue = false
+                if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId) {
+                    playing = .init(unit: next.0, lesson: next.1)
+                }
+            }
         }
     }
 
@@ -54,7 +63,7 @@ struct HomePathView: View {
                 Text(broken ? "Sarge dozed off. Wake him with a lesson!" : streak == 0 ? "Ready, recruit?" : "\(streak)-day streak. Keep it up!").font(.headline)
                 XPBar(to: goal.progress(lessonsToday: today), label: "Daily goal: \(min(today, goal.lessonsPerDay))/\(goal.lessonsPerDay) lessons")
                 Text("You're here: \(content.course.rungs[safe: rung]?.title ?? "Chat")").font(.subheadline).foregroundStyle(.secondary)
-                if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro) {
+                if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId) {
                     Button("Start: \(next.1.title)") { playing = .init(unit: next.0, lesson: next.1) }
                         .buttonStyle(ChunkyButtonStyle()).padding(.top, 4)
                 }
@@ -104,7 +113,7 @@ struct HomePathView: View {
             .background(unit.isFree ? Color.brandTeal : Color.brandNavy, in: RoundedRectangle(cornerRadius: 16))
 
             ForEach(Array(unit.lessons.enumerated()), id: \.element.id) { i, lesson in
-                let state = content.planner.state(of: lesson, in: unit, completed: completed, hasPro: pro.hasPro)
+                let state = content.planner.state(of: lesson, in: unit, completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId)
                 LessonNode(lesson: lesson, state: state)
                     .offset(x: CGFloat([0, 50, 0, -50][i % 4]))
                     .onTapGesture {

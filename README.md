@@ -35,7 +35,7 @@ Missed questions come back at the end of a lesson (no hearts). Unit checks need 
 Streaks: one lesson/day; a freeze is earned every 7 days (max 2).
 
 ## v0.2 features
-- **Onboarding:** Sarge Byte intro → goal → daily goal (+ optional reminder).
+- **Onboarding (v0.3, Duolingo-style):** one question per screen with big tappable cards and a springy progress bar: Sarge waves hello → why learn AI (work / side money / fun / school or kids) → how much you know (3 levels) → daily goal (3/5/10/15 min) → opt-in reminder → a 1-question first win (+XP, confetti, day-1 streak) → "Your plan is ready" → straight into the first lesson. Typing speech bubble, bouncy cards, haptics; Reduce Motion turns the motion off. Every screen has Skip, and "Set up later" skips it all. Answers are saved on `PlayerProfile` (`whyLearn`, `skillLevel`, `dailyMinutes`, `startUnitId`); minutes set the lessons-per-day goal (3→1, 5→2, 10→3, 15→5) and the level sets the starting unit (new→Unit 1, some→Unit 2, comfy→Unit 3, all free). Earlier units stay playable. Rules live in `BotcampCore/Onboarding.swift` and are covered by `OnboardingTests`, including a check that copy lines are 8 words or fewer.
 - **Review mode:** every first-time miss is saved (`MissedQuestion`); the Learn tab shows a Review card (up to 10 per session). Right on the first try clears it.
 - **Daily-goal reminders:** opt-in, local `UNUserNotificationCenter` only; permission is asked only when you turn it on. Skips today if the goal is met.
 - **Plan tab:** native port of the web capstone advisor (`BotcampCore/Advisor.swift`), with links back to units.

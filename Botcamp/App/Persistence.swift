@@ -16,6 +16,11 @@ final class PlayerProfile {
     var remindersOn: Bool = false
     var reminderHour: Int = 19
     var reminderMinute: Int = 0
+    // v0.3 onboarding answers (defaults keep migration automatic)
+    var whyLearn: String = ""          // Onboarding.Reason rawValue, "" if skipped
+    var skillLevel: String = ""        // Onboarding.Level rawValue, "" if skipped
+    var dailyMinutes: Int = 5
+    var startUnitId: String = ""       // placement unit ("" = Unit 1)
 
     init() {}
 
@@ -67,6 +72,25 @@ enum ProgressWriter {
         context.insert(LessonRecord(lessonId: lesson.id, xpEarned: xp, mistakes: mistakes, completedAt: now))
         try? context.save()
         return xp
+    }
+
+    /// Saves the onboarding answers: daily goal, placement unit, reminder wish, and the first-win XP + streak.
+    static func applyOnboarding(_ r: Onboarding.Result, reminderHour: Int, reminderMinute: Int, in context: ModelContext, now: Date = .now) -> PlayerProfile {
+        let p = profile(in: context)
+        p.whyLearn = r.reason?.rawValue ?? ""
+        p.skillLevel = r.level?.rawValue ?? ""
+        p.dailyMinutes = r.dailyMinutes
+        p.dailyGoal = r.lessonsPerDay
+        p.startUnitId = r.startUnitId
+        p.reminderHour = reminderHour; p.reminderMinute = reminderMinute
+        if r.didFirstWin {
+            p.totalXP += r.xpEarned
+            var streak = p.streak; streak.recordActivity(now: now); p.streak = streak
+            context.insert(LessonRecord(lessonId: Onboarding.firstWinLessonId, xpEarned: r.xpEarned, mistakes: 0, completedAt: now))
+        }
+        p.hasOnboarded = true
+        try? context.save()
+        return p
     }
 
     static func recordMiss(lessonId: String, stepIndex: Int, in context: ModelContext) {

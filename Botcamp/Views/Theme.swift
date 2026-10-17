@@ -18,13 +18,14 @@ struct SargeByte: View {
     var pose: MascotPose = .idle
     var size: CGFloat = 120
     @State private var bob = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         Image("mascot-\(pose.rawValue)")
             .resizable().scaledToFit()
             .frame(width: size, height: size)
             .offset(y: bob ? -4 : 4)
             .animation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: bob)
-            .onAppear { bob = pose != .sleeping }
+            .onAppear { bob = pose != .sleeping && !reduceMotion }
             .accessibilityLabel("Sarge Byte, the Botcamp mascot")
     }
 }

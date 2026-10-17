@@ -35,6 +35,7 @@ struct StreakFlame: View {
     var streak: Int
     var size: CGFloat = 22
     @State private var flicker = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         HStack(spacing: 3) {
             ZStack {
@@ -47,7 +48,7 @@ struct StreakFlame: View {
             .animation(streak > 0 ? .easeInOut(duration: 0.35).repeatForever(autoreverses: true) : .default, value: flicker)
             Text("\(streak)").font(.subheadline.bold()).foregroundStyle(Color.brandOrange)
         }
-        .onAppear { flicker = streak > 0 }
+        .onAppear { flicker = streak > 0 && !reduceMotion }
         .accessibilityElement(children: .ignore).accessibilityLabel("\(streak) day streak")
     }
 }
@@ -85,6 +86,7 @@ struct XPBar: View {
 struct SleepingSarge: View {
     var size: CGFloat = 84
     @State private var drift = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         ZStack(alignment: .topTrailing) {
             SargeByte(pose: .sleeping, size: size)
@@ -95,7 +97,7 @@ struct SleepingSarge: View {
                     .animation(.easeOut(duration: 2.4).repeatForever(autoreverses: false).delay(Double(i) * 0.6), value: drift)
             }
         }
-        .onAppear { drift = true }
+        .onAppear { drift = !reduceMotion }
         .accessibilityLabel("Sarge Byte is asleep. Your streak ended.")
     }
 }

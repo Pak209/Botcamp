@@ -69,10 +69,12 @@ public struct PathPlanner: Sendable {
         unit.lessons.allSatisfy { completed.contains($0.id) }
     }
 
-    public func state(of lesson: Lesson, in unit: Unit, completed: Set<String>, hasPro: Bool) -> LessonState {
+    /// `startUnitId` is the onboarding placement: that unit opens without the units before it,
+    /// and the units before it stay playable (in order) so nothing is ever hidden.
+    public func state(of lesson: Lesson, in unit: Unit, completed: Set<String>, hasPro: Bool, startUnitId: String? = nil) -> LessonState {
         if completed.contains(lesson.id) { return .done }
         if !unit.isFree && !hasPro { return .needsPro }
-        if let ui = course.units.firstIndex(where: { $0.id == unit.id }), ui > 0,
+        if let ui = course.units.firstIndex(where: { $0.id == unit.id }), ui > 0, ui > placementIndex(startUnitId),
            !isUnitComplete(course.units[ui - 1], completed: completed), !course.units[ui - 1].isStub {
             return .locked
         }
@@ -80,10 +82,18 @@ public struct PathPlanner: Sendable {
         return li == 0 || completed.contains(unit.lessons[li - 1].id) ? .available : .locked
     }
 
-    /// The next lesson to suggest on the home screen.
-    public func nextLesson(completed: Set<String>, hasPro: Bool) -> (Unit, Lesson)? {
-        for unit in course.units {
-            for lesson in unit.lessons where state(of: lesson, in: unit, completed: completed, hasPro: hasPro) == .available {
+    /// Index of the placement unit (0 when none or unknown).
+    public func placementIndex(_ startUnitId: String?) -> Int {
+        guard let id = startUnitId, !id.isEmpty else { return 0 }
+        return course.units.firstIndex { $0.id == id } ?? 0
+    }
+
+    /// The next lesson to suggest on the home screen. Starts at the placement unit, then wraps to earlier units.
+    public func nextLesson(completed: Set<String>, hasPro: Bool, startUnitId: String? = nil) -> (Unit, Lesson)? {
+        let start = placementIndex(startUnitId)
+        let ordered = Array(course.units[start...]) + Array(course.units[..<start])
+        for unit in ordered {
+            for lesson in unit.lessons where state(of: lesson, in: unit, completed: completed, hasPro: hasPro, startUnitId: startUnitId) == .available {
                 return (unit, lesson)
             }
         }
