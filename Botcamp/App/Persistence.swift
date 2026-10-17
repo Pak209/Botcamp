@@ -9,6 +9,18 @@ final class PlayerProfile {
     var streakData: Data = Data()
     var dailyGoal: Int = 1
     var createdAt: Date = Date()
+    // v0.2 (defaults keep SwiftData's lightweight migration automatic)
+    var hasOnboarded: Bool = false
+    var goalText: String = ""
+    var playerName: String = ""
+    var remindersOn: Bool = false
+    var reminderHour: Int = 19
+    var reminderMinute: Int = 0
+    // v0.3 onboarding answers (defaults keep migration automatic)
+    var whyLearn: String = ""          // Onboarding.Reason rawValue, "" if skipped
+    var skillLevel: String = ""        // Onboarding.Level rawValue, "" if skipped
+    var dailyMinutes: Int = 5
+    var startUnitId: String = ""       // placement unit ("" = Unit 1)
 
     init() {}
 
@@ -32,6 +44,16 @@ final class LessonRecord {
     }
 }
 
+/// A question missed at least once; lives until answered right in Review.
+@Model
+final class MissedQuestion {
+    var lessonId: String = ""
+    var stepIndex: Int = 0
+    var missedAt: Date = Date()
+    init(lessonId: String, stepIndex: Int, missedAt: Date = .now) { self.lessonId = lessonId; self.stepIndex = stepIndex; self.missedAt = missedAt }
+    var ref: MissedRef { MissedRef(lessonId: lessonId, stepIndex: stepIndex) }
+}
+
 enum ProgressWriter {
     static func profile(in context: ModelContext) -> PlayerProfile {
         if let p = try? context.fetch(FetchDescriptor<PlayerProfile>()).first { return p }
@@ -52,7 +74,38 @@ enum ProgressWriter {
         return xp
     }
 
+    /// Saves the onboarding answers: daily goal, placement unit, reminder wish, and the first-win XP + streak.
+    static func applyOnboarding(_ r: Onboarding.Result, reminderHour: Int, reminderMinute: Int, in context: ModelContext, now: Date = .now) -> PlayerProfile {
+        let p = profile(in: context)
+        p.whyLearn = r.reason?.rawValue ?? ""
+        p.skillLevel = r.level?.rawValue ?? ""
+        p.dailyMinutes = r.dailyMinutes
+        p.dailyGoal = r.lessonsPerDay
+        p.startUnitId = r.startUnitId
+        p.reminderHour = reminderHour; p.reminderMinute = reminderMinute
+        if r.didFirstWin {
+            p.totalXP += r.xpEarned
+            var streak = p.streak; streak.recordActivity(now: now); p.streak = streak
+            context.insert(LessonRecord(lessonId: Onboarding.firstWinLessonId, xpEarned: r.xpEarned, mistakes: 0, completedAt: now))
+        }
+        p.hasOnboarded = true
+        try? context.save()
+        return p
+    }
+
+    static func recordMiss(lessonId: String, stepIndex: Int, in context: ModelContext) {
+        let existing = (try? context.fetch(FetchDescriptor<MissedQuestion>(predicate: #Predicate { $0.lessonId == lessonId && $0.stepIndex == stepIndex }))) ?? []
+        if existing.isEmpty { context.insert(MissedQuestion(lessonId: lessonId, stepIndex: stepIndex)); try? context.save() }
+    }
+
+    static func clearReviewed(_ cleared: [MissedRef], in context: ModelContext) {
+        let all = (try? context.fetch(FetchDescriptor<MissedQuestion>())) ?? []
+        let set = Set(cleared)
+        for m in all where set.contains(m.ref) { context.delete(m) }
+        try? context.save()
+    }
+
     static func todayCount(_ records: [LessonRecord], now: Date = .now) -> Int {
-        records.filter { Calendar.current.isDate($0.completedAt, inSameDayAs: now) }.count
+        records.filter { $0.lessonId != ReviewBuilder.reviewLessonId && Calendar.current.isDate($0.completedAt, inSameDayAs: now) }.count
     }
 }

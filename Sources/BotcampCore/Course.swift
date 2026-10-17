@@ -74,6 +74,9 @@ public struct Lesson: Codable, Equatable, Identifiable, Sendable {
     public var steps: [Step]
 
     enum CodingKeys: String, CodingKey { case id, title, xp, isUnitCheck, passFraction, steps }
+    public init(id: String, title: String, xp: Int = 10, isUnitCheck: Bool = false, passFraction: Double = 0, steps: [Step]) {
+        self.id = id; self.title = title; self.xp = xp; self.isUnitCheck = isUnitCheck; self.passFraction = passFraction; self.steps = steps
+    }
     public init(from d: Decoder) throws {
         let c = try d.container(keyedBy: CodingKeys.self)
         id = try c.decode(String.self, forKey: .id)

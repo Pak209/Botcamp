@@ -1,4 +1,4 @@
-# Botcamp: Learn AI (iOS, v0.1 MVP)
+# Botcamp: Learn AI (iOS, v0.2)
 
 Duolingo-style SwiftUI app that teaches AI from zero. Mascot: **Sarge Byte**.
 Plan: `get-up-to-speed/APP-PLAN.md`. Pricing: Units 1–3 free; **Pro** is a one-time ~$4.99 StoreKit 2 unlock (placeholder product `com.pak209.botcamp.pro`). Lifetime tier comes later.
@@ -13,11 +13,11 @@ swift test                 # runs BotcampCore unit tests (no simulator needed)
 The Botcamp scheme uses `Botcamp/Botcamp.storekit`, so the Pro purchase works locally without App Store Connect.
 
 ## Content pipeline
-`scripts/build-course.mjs` converts `../get-up-to-speed/content.js` + `content/units-1-3.overlay.json` into `Botcamp/Resources/course.json` (data only, guideline 2.5.2 friendly):
+`scripts/build-course.mjs` converts `../get-up-to-speed/content.js` + every `content/*.overlay.json` into `Botcamp/Resources/course.json` (data only, guideline 2.5.2 friendly):
 ```bash
 node scripts/build-course.mjs [path/to/content.js]
 ```
-Units 1–3 are fully authored. Units 4–10 are stubs (one preview card each, Pro-gated).
+All 10 units are fully authored (50 lessons). Units 4–10 are Pro-gated. Facts come only from content.js / PLAN.md (checked Oct 14, 2026).
 
 ## Layout
 | Path | What |
@@ -34,5 +34,13 @@ explain · choice · true/false · multi-select (unit checks) · spot the better
 Missed questions come back at the end of a lesson (no hearts). Unit checks need 70% first-try correct.
 Streaks: one lesson/day; a freeze is earned every 7 days (max 2).
 
+## v0.2 features
+- **Onboarding (v0.3, Duolingo-style):** one question per screen with big tappable cards and a springy progress bar: Sarge waves hello → why learn AI (work / side money / fun / school or kids) → how much you know (3 levels) → daily goal (3/5/10/15 min) → opt-in reminder → a 1-question first win (+XP, confetti, day-1 streak) → "Your plan is ready" → straight into the first lesson. Typing speech bubble, bouncy cards, haptics; Reduce Motion turns the motion off. Every screen has Skip, and "Set up later" skips it all. Answers are saved on `PlayerProfile` (`whyLearn`, `skillLevel`, `dailyMinutes`, `startUnitId`); minutes set the lessons-per-day goal (3→1, 5→2, 10→3, 15→5) and the level sets the starting unit (new→Unit 1, some→Unit 2, comfy→Unit 3, all free). Earlier units stay playable. Rules live in `BotcampCore/Onboarding.swift` and are covered by `OnboardingTests`, including a check that copy lines are 8 words or fewer.
+- **Review mode:** every first-time miss is saved (`MissedQuestion`); the Learn tab shows a Review card (up to 10 per session). Right on the first try clears it.
+- **Daily-goal reminders:** opt-in, local `UNUserNotificationCenter` only; permission is asked only when you turn it on. Skips today if the goal is met.
+- **Plan tab:** native port of the web capstone advisor (`BotcampCore/Advisor.swift`), with links back to units.
+- **Certificate:** unlocked when all 50 lessons are done; rendered with `ImageRenderer` and shared via `ShareLink`.
+- **Mascot moments:** level-up burst on rank-up, flickering streak flame, animated XP/daily-goal bars, sleeping Sarge with Zzz on a broken streak (`Views/MascotMoments.swift`).
+
 ## Not done yet
-TestFlight / App Store Connect product, onboarding, daily-goal reminders, review mode, certificate, capstone planner, Units 4–10 content. Re-check Apple guidelines and model facts before submitting.
+First Xcode build on a Mac (UI code is syntax-checked only), TestFlight / App Store Connect product, privacy/support pages, store listing. Re-check Apple guidelines and model facts before submitting.

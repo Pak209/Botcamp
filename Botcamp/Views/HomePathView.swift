@@ -4,14 +4,19 @@ import BotcampCore
 
 /// Duolingo-style winding path. Ladder rungs from content.js become section headers.
 struct HomePathView: View {
+    /// Set by RootTabView after onboarding: open the first lesson of the placement unit.
+    var autoStart: Binding<Bool> = .constant(false)
     @Environment(CourseStore.self) private var content
     @Environment(ProStore.self) private var pro
     @Query private var profiles: [PlayerProfile]
     @Query private var records: [LessonRecord]
+    @Query(sort: \MissedQuestion.missedAt) private var missed: [MissedQuestion]
     @State private var playing: PlayTarget?
+    @State private var reviewing: ReviewTarget?
     @State private var showPaywall = false
 
     struct PlayTarget: Identifiable { let unit: BotcampCore.Unit; let lesson: Lesson; var id: String { lesson.id } }
+    struct ReviewTarget: Identifiable { let lesson: Lesson; let refs: [MissedRef]; let id = UUID() }
 
     private var completed: Set<String> { Set(records.map(\.lessonId)) }
     private var profile: PlayerProfile? { profiles.first }
@@ -21,6 +26,7 @@ struct HomePathView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     header
+                    reviewCard
                     ForEach(content.course.units) { unit in unitSection(unit) }
                     Text("Model facts last checked \(content.course.lastChecked).")
                         .font(.caption).foregroundStyle(.secondary).padding(.bottom, 30)
@@ -31,19 +37,33 @@ struct HomePathView: View {
             .navigationTitle("Botcamp")
             .toolbar { ToolbarItem(placement: .topBarTrailing) { statsPill } }
             .fullScreenCover(item: $playing) { t in LessonPlayerView(unit: t.unit, lesson: t.lesson, completed: completed) }
+            .fullScreenCover(item: $reviewing) { t in
+                LessonPlayerView(unit: content.course.units[0], lesson: t.lesson, completed: completed, reviewRefs: t.refs)
+            }
             .sheet(isPresented: $showPaywall) { PaywallView() }
+            .onChange(of: autoStart.wrappedValue) { _, go in
+                guard go else { return }
+                autoStart.wrappedValue = false
+                if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId) {
+                    playing = .init(unit: next.0, lesson: next.1)
+                }
+            }
         }
     }
 
     private var header: some View {
         let streak = profile?.streak.displayed(now: .now) ?? 0
         let rung = content.planner.currentRung(completed: completed)
+        let broken = profile.map { Moments.streakBroken($0.streak, now: .now) } ?? false
+        let goal = DailyGoal(lessonsPerDay: profile?.dailyGoal ?? 1)
+        let today = ProgressWriter.todayCount(records)
         return HStack(spacing: 12) {
-            SargeByte(pose: streak == 0 && !records.isEmpty ? .sleeping : .idle, size: 84)
+            if broken { SleepingSarge(size: 84) } else { SargeByte(pose: .idle, size: 84) }
             VStack(alignment: .leading, spacing: 4) {
-                Text(streak == 0 ? "Ready, recruit?" : "\(streak)-day streak. Keep it up!").font(.headline)
+                Text(broken ? "Sarge dozed off. Wake him with a lesson!" : streak == 0 ? "Ready, recruit?" : "\(streak)-day streak. Keep it up!").font(.headline)
+                XPBar(to: goal.progress(lessonsToday: today), label: "Daily goal: \(min(today, goal.lessonsPerDay))/\(goal.lessonsPerDay) lessons")
                 Text("You're here: \(content.course.rungs[safe: rung]?.title ?? "Chat")").font(.subheadline).foregroundStyle(.secondary)
-                if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro) {
+                if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId) {
                     Button("Start: \(next.1.title)") { playing = .init(unit: next.0, lesson: next.1) }
                         .buttonStyle(ChunkyButtonStyle()).padding(.top, 4)
                 }
@@ -52,9 +72,25 @@ struct HomePathView: View {
         .padding().background(.white, in: RoundedRectangle(cornerRadius: 20))
     }
 
+    @ViewBuilder private var reviewCard: some View {
+        let refs = ReviewBuilder.steps(for: missed.map(\.ref), in: content.course).map(\.0)
+        if !refs.isEmpty, let lesson = ReviewBuilder.lesson(for: refs, in: content.course) {
+            HStack {
+                Image(systemName: "arrow.counterclockwise.circle.fill").font(.title).foregroundStyle(Color.brandOrange)
+                VStack(alignment: .leading) {
+                    Text("Review mode").font(.headline)
+                    Text("\(missed.count) question\(missed.count == 1 ? "" : "s") to practice").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Practice") { reviewing = ReviewTarget(lesson: lesson, refs: refs) }.buttonStyle(.borderedProminent).tint(.brandOrange)
+            }
+            .padding().background(.white, in: RoundedRectangle(cornerRadius: 16))
+        }
+    }
+
     private var statsPill: some View {
         HStack(spacing: 10) {
-            Label("\(profile?.streak.displayed(now: .now) ?? 0)", systemImage: "flame.fill").foregroundStyle(Color.brandOrange)
+            StreakFlame(streak: profile?.streak.displayed(now: .now) ?? 0, size: 16)
             Label("\(profile?.totalXP ?? 0)", systemImage: "bolt.fill").foregroundStyle(Color.brandTeal)
         }.font(.subheadline.bold())
     }
@@ -77,7 +113,7 @@ struct HomePathView: View {
             .background(unit.isFree ? Color.brandTeal : Color.brandNavy, in: RoundedRectangle(cornerRadius: 16))
 
             ForEach(Array(unit.lessons.enumerated()), id: \.element.id) { i, lesson in
-                let state = content.planner.state(of: lesson, in: unit, completed: completed, hasPro: pro.hasPro)
+                let state = content.planner.state(of: lesson, in: unit, completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId)
                 LessonNode(lesson: lesson, state: state)
                     .offset(x: CGFloat([0, 50, 0, -50][i % 4]))
                     .onTapGesture {

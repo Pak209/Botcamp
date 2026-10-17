@@ -7,6 +7,8 @@ struct LessonPlayerView: View {
     let unit: BotcampCore.Unit
     let lesson: Lesson
     let completed: Set<String>
+    /// Set when playing Review mode: refs[i] is the source of lesson.steps[i].
+    var reviewRefs: [MissedRef]? = nil
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -17,7 +19,7 @@ struct LessonPlayerView: View {
     @State private var finished: Result?
 
     struct Feedback { let correct: Bool; let explain: String? }
-    struct Result { let xp: Int; let passed: Bool; let firstTryCorrect: Int }
+    struct Result { let xp: Int; let passed: Bool; let firstTryCorrect: Int; var xpBefore: Int = 0; var rankUp: Rank? = nil }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -61,7 +63,10 @@ struct LessonPlayerView: View {
     private func answered(index: Int, correct: Bool) {
         let step = lesson.steps[index]
         guard step.isGraded else { advance(); return }
-        if !correct { missedOnce.insert(index); queue.append(index) }
+        if !correct {
+            if !missedOnce.contains(index) && reviewRefs == nil { ProgressWriter.recordMiss(lessonId: lesson.id, stepIndex: index, in: context) }
+            missedOnce.insert(index); queue.append(index)
+        }
         feedback = Feedback(correct: correct, explain: step.explanation)
     }
 
@@ -74,9 +79,17 @@ struct LessonPlayerView: View {
     private func finish() {
         let firstTry = lesson.steps.indices.filter { lesson.steps[$0].isGraded && !missedOnce.contains($0) }.count
         let passed = XPRules.passed(lesson, correct: firstTry)
+        let before = ProgressWriter.profile(in: context).totalXP
         var xp = 0
         if passed { xp = ProgressWriter.finish(lesson: lesson, mistakes: missedOnce.count, completed: completed, in: context) }
-        finished = Result(xp: xp, passed: passed, firstTryCorrect: firstTry)
+        if let refs = reviewRefs {
+            let keep = Set(ReviewBuilder.remaining(after: refs, missedInSession: missedOnce))
+            ProgressWriter.clearReviewed(refs.filter { !keep.contains($0) }, in: context)
+        }
+        let profile = ProgressWriter.profile(in: context)
+        let today = (try? context.fetch(FetchDescriptor<LessonRecord>())).map { ProgressWriter.todayCount($0) } ?? 0
+        ReminderScheduler.reschedule(profile: profile, lessonsToday: today)
+        finished = Result(xp: xp, passed: passed, firstTryCorrect: firstTry, xpBefore: before, rankUp: Moments.rankUp(from: before, to: before + xp))
     }
 }
 
@@ -97,10 +110,15 @@ struct FinishView: View {
     var body: some View {
         VStack(spacing: 18) {
             Spacer()
-            SargeByte(pose: result.passed ? .cheer : .thinking, size: 160)
+            if let rank = result.rankUp { LevelUpBurst(rank: rank) }
+            else { SargeByte(pose: result.passed ? .cheer : .thinking, size: 160) }
             Text(result.passed ? "Lesson complete!" : "Almost there").font(.largeTitle.weight(.heavy))
             if result.passed {
                 Label("+\(result.xp) XP", systemImage: "bolt.fill").font(.title2.bold()).foregroundStyle(Color.brandTeal)
+                XPBar(from: Moments.rankProgress(xp: result.xpBefore) <= Moments.rankProgress(xp: result.xpBefore + result.xp) ? Moments.rankProgress(xp: result.xpBefore) : 0,
+                      to: Moments.rankProgress(xp: result.xpBefore + result.xp),
+                      label: "\(Rank.forXP(result.xpBefore + result.xp).title) · \(result.xpBefore + result.xp) XP")
+                    .padding(.horizontal, 30)
             } else {
                 Text("You got \(result.firstTryCorrect) of \(lesson.gradedCount) on the first try. Pass mark is \(Int(lesson.passFraction * 100))%. Give it another go.")
                     .multilineTextAlignment(.center)
