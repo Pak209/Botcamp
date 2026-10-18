@@ -26,12 +26,23 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 16) {
             topBar
-            ZStack {
-                screen
-                    .id(flow.step)
-                    .transition(screenTransition)
+            GeometryReader { geo in
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        ZStack(alignment: .top) {
+                            screen
+                                .id(flow.step)
+                                .transition(screenTransition)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: geo.size.height, alignment: .top)
+                        .id("onboarding-top")
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .onChange(of: flow.step) { _, _ in
+                        proxy.scrollTo("onboarding-top", anchor: .top)
+                    }
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             bottomButton
         }
         .padding()
@@ -53,14 +64,17 @@ struct OnboardingView: View {
             .opacity(flow.step == .hello || flow.isLast ? 0 : 1)
             .disabled(flow.step == .hello || flow.isLast)
             .accessibilityLabel("Back")
+            .layoutPriority(1)
 
             SpringProgressBar(value: flow.progress)
+                .frame(minWidth: 48, maxWidth: .infinity)
 
             Button("Skip") { tapCount += 1; go { flow.skip() } }
                 .font(.subheadline.weight(.heavy))
                 .opacity(flow.isLast ? 0 : 1)
                 .disabled(flow.isLast)
                 .accessibilityHint("Skip this question")
+                .layoutPriority(1)
         }
         .foregroundStyle(Color.brandNavy)
     }
@@ -71,8 +85,13 @@ struct OnboardingView: View {
                 .buttonStyle(ChunkyButtonStyle(color: flow.canContinue ? .brandTeal : .gray.opacity(0.35)))
                 .disabled(!flow.canContinue)
             if flow.step == .hello {
-                Button("Set up later") { tapCount += 1; go { flow.skipAll() } }
-                    .font(.subheadline.weight(.semibold)).foregroundStyle(Color.brandNavy.opacity(0.7))
+                Button { tapCount += 1; go { flow.skipAll() } } label: {
+                    Text("Set up later")
+                        .font(.subheadline.weight(.semibold))
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .foregroundStyle(Color.brandNavy.opacity(0.7))
             }
         }
     }
@@ -140,7 +159,10 @@ struct OnboardingView: View {
                     } label: {
                         VStack(spacing: 10) {
                             Image(systemName: r.icon).font(.system(size: 40)).foregroundStyle(Color.brandTeal)
-                            Text(r.label).font(.headline.weight(.heavy)).multilineTextAlignment(.center)
+                            Text(r.label)
+                                .font(.headline.weight(.heavy))
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(maxWidth: .infinity, minHeight: 120)
                     }
@@ -155,13 +177,13 @@ struct OnboardingView: View {
             SargeRow(text: bubble, pose: .thinking)
             ForEach(Onboarding.Level.allCases, id: \.self) { l in
                 Button { tapCount += 1; flow.level = l } label: {
-                    HStack(spacing: 14) {
+                    HStack(alignment: .center, spacing: 14) {
                         LevelBars(filled: l.bars)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(l.label).font(.headline.weight(.heavy))
-                            Text(l.detail).font(.subheadline).foregroundStyle(.secondary)
+                            Text(l.label).font(.headline.weight(.heavy)).fixedSize(horizontal: false, vertical: true)
+                            Text(l.detail).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                         }
-                        Spacer()
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 .buttonStyle(BigCardStyle(selected: flow.level == l))
@@ -175,10 +197,15 @@ struct OnboardingView: View {
             ForEach(Onboarding.minuteOptions, id: \.self) { m in
                 let label = Onboarding.minutesLabel(m)
                 Button { tapCount += 1; flow.minutes = m } label: {
-                    HStack {
-                        Text(label.title).font(.headline.weight(.heavy))
-                        Spacer()
-                        Text(label.tag).font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
+                    HStack(alignment: .center, spacing: 8) {
+                        Text(label.title)
+                            .font(.headline.weight(.heavy))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                        Text(label.tag)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                 }
                 .buttonStyle(BigCardStyle(selected: flow.minutes == m))
@@ -194,7 +221,10 @@ struct OnboardingView: View {
                 .symbolEffect(.pulse, options: .repeating, isActive: !reduceMotion)
                 .padding(.vertical, 8)
                 .accessibilityHidden(true)
-            Text("I'll ping you once a day.").font(.headline)
+            Text("I'll ping you once a day.")
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
             DatePicker("Time", selection: $remindAt, displayedComponents: .hourAndMinute)
                 .font(.headline)
                 .padding().background(.white, in: RoundedRectangle(cornerRadius: 16))
@@ -210,7 +240,11 @@ struct OnboardingView: View {
                 }
             } label: { Label("Yes, remind me", systemImage: "bell.fill").frame(maxWidth: .infinity) }
             .buttonStyle(BigCardStyle(selected: true))
-            Text("You can turn this off in Profile.").font(.caption).foregroundStyle(.secondary)
+            Text("You can turn this off in Profile.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -218,7 +252,11 @@ struct OnboardingView: View {
         let q = Onboarding.firstWin
         return VStack(spacing: 16) {
             SargeRow(text: bubble, pose: flow.firstWinSolved ? .cheer : .thinking)
-            Text(q.prompt).font(.title2.weight(.heavy)).multilineTextAlignment(.center)
+            Text(q.prompt)
+                .font(.title2.weight(.heavy))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
             ForEach(Array(q.options.enumerated()), id: \.offset) { i, option in
                 Button {
                     tapCount += 1
@@ -226,7 +264,11 @@ struct OnboardingView: View {
                     if right { winCount += 1; bubble = q.right; showConfetti = true }
                     else { missCount += 1; bubble = q.wrong }
                 } label: {
-                    Text("\u{201C}\(option)\u{201D}").font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                    Text("\u{201C}\(option)\u{201D}")
+                        .font(.headline)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(BigCardStyle(selected: flow.firstWinPick == i, tint: tint(for: i)))
                 .modifier(Shake(amount: flow.firstWinPick == i && !flow.firstWinSolved && !reduceMotion ? CGFloat(flow.firstWinTries) : 0))
@@ -253,6 +295,8 @@ struct OnboardingView: View {
             StreakFlame(streak: r.didFirstWin ? 1 : 0, size: 72)
             Text(r.didFirstWin ? "Day 1 streak. Nice start!" : "Do a lesson to light it.")
                 .font(.headline)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
             VStack(spacing: 10) {
                 PlanRow(icon: "clock.fill", text: "\(r.dailyMinutes) min a day")
                 PlanRow(icon: "map.fill", text: "Start: Unit \(startUnit?.number ?? 1)")
@@ -311,18 +355,19 @@ struct SpringProgressBar: View {
 }
 
 /// Sarge's speech bubble. Text types out letter by letter; tap to show it all.
+/// The full line is always laid out (invisibly) so the bubble is as tall as the
+/// finished sentence and nothing truncates while it types.
 struct SpeechBubble: View {
     var text: String
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown = 0
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Text(text).hidden()
-            Text(String(text.prefix(shown)))
+            bubbleText(text).opacity(0).accessibilityHidden(true)
+            bubbleText(String(text.prefix(shown))).foregroundStyle(Color.brandNavy)
         }
-        .font(.title3.weight(.bold))
-        .foregroundStyle(Color.brandNavy)
         .padding(.horizontal, 16).padding(.vertical, 12)
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         .background(.white, in: RoundedRectangle(cornerRadius: 18))
         .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.brandNavy.opacity(0.15), lineWidth: 2))
         .contentShape(Rectangle())
@@ -339,6 +384,15 @@ struct SpeechBubble: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Sarge says: \(text)")
     }
+
+    private func bubbleText(_ string: String) -> some View {
+        Text(string)
+            .font(.title3.weight(.bold))
+            .multilineTextAlignment(.leading)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
 }
 
 /// Small Sarge next to his bubble, for question screens.
@@ -346,9 +400,10 @@ struct SargeRow: View {
     var text: String
     var pose: MascotPose
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
+        HStack(alignment: .top, spacing: 10) {
             SargeByte(pose: pose, size: 84)
-            SpeechBubble(text: text).frame(maxWidth: .infinity, alignment: .leading)
+            SpeechBubble(text: text)
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -380,16 +435,29 @@ struct BigCardStyle: ButtonStyle {
     var tint: Color = .brandTeal
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     func makeBody(configuration: Configuration) -> some View {
+        let pressed = configuration.isPressed
         configuration.label
             .foregroundStyle(Color.brandNavy)
             .padding(18)
-            .frame(maxWidth: .infinity)
-            .background(selected ? tint.opacity(0.22) : .white, in: RoundedRectangle(cornerRadius: 18))
-            .overlay(RoundedRectangle(cornerRadius: 18).stroke(selected ? tint : Color.brandNavy.opacity(0.2), lineWidth: 3))
-            .shadow(color: selected ? tint : Color.brandNavy.opacity(0.2), radius: 0, y: configuration.isPressed ? 0 : 4)
-            .offset(y: configuration.isPressed ? 3 : 0)
-            .scaleEffect(reduceMotion ? 1 : (configuration.isPressed ? 0.94 : (selected ? 1.02 : 1)))
-            .animation(reduceMotion ? nil : .spring(response: 0.28, dampingFraction: 0.45), value: configuration.isPressed)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background {
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(selected ? tint.opacity(0.22) : Color.white)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(selected ? tint : Color.brandNavy.opacity(0.2), lineWidth: 3)
+            }
+            // Same rule as ChunkyButtonStyle: depth behind the card, never a
+            // shadow of the label (that draws the words twice).
+            .background {
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(selected ? tint : Color.brandNavy.opacity(0.2))
+                    .offset(y: pressed ? 0 : 4)
+            }
+            .offset(y: pressed ? 3 : 0)
+            .scaleEffect(reduceMotion ? 1 : (pressed ? 0.94 : (selected ? 1.02 : 1)))
+            .animation(reduceMotion ? nil : .spring(response: 0.28, dampingFraction: 0.45), value: pressed)
             .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.5), value: selected)
             .accessibilityAddTraits(selected ? .isSelected : [])
     }
@@ -415,10 +483,12 @@ struct PlanRow: View {
     var icon: String
     var text: String
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon).foregroundStyle(Color.brandTeal).frame(width: 28)
-            Text(text).font(.headline)
-            Spacer()
+            Text(text)
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         }
     }
 }

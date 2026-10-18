@@ -24,14 +24,27 @@ struct StepView: View {
 
 struct StepTitle: View {
     let text: String
-    var body: some View { Text(text).font(.title2.weight(.heavy)).foregroundStyle(Color.brandNavy).frame(maxWidth: .infinity, alignment: .leading) }
+    var body: some View {
+        Text(text)
+            .font(.title2.weight(.heavy))
+            .foregroundStyle(Color.brandNavy)
+            .multilineTextAlignment(.leading)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
 }
 
 struct OptionRow: View {
     let text: String
     let selected: Bool
     var body: some View {
-        Text(text).frame(maxWidth: .infinity, alignment: .leading).padding()
+        Text(text)
+            .multilineTextAlignment(.leading)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
             .background(selected ? Color.brandTeal.opacity(0.25) : .white, in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(selected ? Color.brandTeal : .gray.opacity(0.4), lineWidth: selected ? 3 : 1.5))
             .contentShape(Rectangle())
@@ -45,7 +58,7 @@ struct ExplainStepView: View {
         VStack(alignment: .leading, spacing: 16) {
             StepTitle(text: step.title)
             if let d = step.diagram { FlowDiagram(boxes: d) }
-            Text(step.text).font(.body)
+            Text(step.text).font(.body).fixedSize(horizontal: false, vertical: true)
             if let note = step.note { Label(note, systemImage: "calendar").font(.footnote).foregroundStyle(.secondary) }
             Button("Got it") { onResult(true) }.buttonStyle(ChunkyButtonStyle()).padding(.top)
         }
@@ -75,7 +88,11 @@ struct MultiSelectStepView: View {
     var body: some View {
         VStack(spacing: 12) {
             StepTitle(text: step.question)
-            Text("Select all that apply").font(.footnote).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+            Text("Select all that apply")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
             ForEach(step.options.indices, id: \.self) { i in
                 OptionRow(text: step.options[i], selected: picked.contains(i)).onTapGesture { picked.formSymmetricDifference([i]) }
             }
@@ -109,10 +126,17 @@ struct FixPromptStepView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             StepTitle(text: "Fix the prompt")
-            Text("Tap the pieces that make this prompt stronger.").font(.subheadline).foregroundStyle(.secondary)
+            Text("Tap the pieces that make this prompt stronger.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 6) {
-                Text(step.base)
-                ForEach(on.sorted(), id: \.self) { i in Text(step.chips[i].text).foregroundStyle(Color.brandOlive) }
+                Text(step.base).fixedSize(horizontal: false, vertical: true)
+                ForEach(on.sorted(), id: \.self) { i in
+                    Text(step.chips[i].text)
+                        .foregroundStyle(Color.brandOlive)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .font(.system(.callout, design: .monospaced)).padding()
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -128,10 +152,17 @@ struct FlexibleChips: View {
     let selected: Set<Int>
     let toggle: (Int) -> Void
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 8) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 8)], spacing: 8) {
             ForEach(labels.indices, id: \.self) { i in
                 Button { toggle(i) } label: {
-                    Text("+ \(labels[i])").font(.subheadline.bold()).padding(.vertical, 8).frame(maxWidth: .infinity)
+                    Text("+ \(labels[i])")
+                        .font(.subheadline.bold())
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
                         .background(selected.contains(i) ? Color.brandLime : .white, in: Capsule())
                         .overlay(Capsule().stroke(Color.brandNavy, lineWidth: 2))
                 }.foregroundStyle(Color.brandNavy)
@@ -157,6 +188,7 @@ struct MatchStepView: View {
                             .onTapGesture { activeTerm = term }
                     }
                 }
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 VStack(spacing: 8) {
                     ForEach(meanings, id: \.self) { m in
                         OptionRow(text: m, selected: chosen.values.contains(m)).font(.footnote)
@@ -167,6 +199,7 @@ struct MatchStepView: View {
                             }
                     }
                 }
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
             }
             Button("Check") { onResult(Grader.check(step, chosen: chosen)) }
                 .buttonStyle(ChunkyButtonStyle()).disabled(chosen.count < step.pairs.count)
@@ -182,12 +215,17 @@ struct OrderStepView: View {
     var body: some View {
         VStack(spacing: 12) {
             StepTitle(text: step.prompt)
-            Text("Use the arrows to reorder.").font(.footnote).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+            Text("Use the arrows to reorder.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
             ForEach(Array(items.enumerated()), id: \.element) { i, item in
-                HStack {
+                HStack(alignment: .center, spacing: 8) {
                     Text("\(i + 1).").bold()
                     Text(item)
-                    Spacer()
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     Button { move(i, -1) } label: { Image(systemName: "chevron.up") }.disabled(i == 0)
                     Button { move(i, 1) } label: { Image(systemName: "chevron.down") }.disabled(i == items.count - 1)
                 }

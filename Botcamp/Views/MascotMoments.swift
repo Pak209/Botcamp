@@ -22,7 +22,12 @@ struct LevelUpBurst: View {
             VStack(spacing: 8) {
                 SargeByte(pose: .cheer, size: 150).scaleEffect(go ? 1 : 0.6)
                 Image(rank.badgeAsset).resizable().scaledToFit().frame(width: 72, height: 72).scaleEffect(go ? 1 : 0.2)
-                Text("Promoted to \(rank.title)!").font(.title2.weight(.heavy)).foregroundStyle(Color.brandNavy)
+                Text("Promoted to \(rank.title)!")
+                    .font(.title2.weight(.heavy))
+                    .foregroundStyle(Color.brandNavy)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
             }
         }
         .onAppear { withAnimation(.spring(response: 0.6, dampingFraction: 0.55).delay(0.1)) { go = true } }
@@ -71,7 +76,12 @@ struct XPBar: View {
                 .overlay(Capsule().stroke(Color.brandNavy, lineWidth: 2))
             }
             .frame(height: 18)
-            if let label { Text(label).font(.caption.weight(.semibold)).foregroundStyle(.secondary) }
+            if let label {
+                Text(label)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .onAppear {
             shown = from

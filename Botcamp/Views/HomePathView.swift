@@ -57,17 +57,23 @@ struct HomePathView: View {
         let broken = profile.map { Moments.streakBroken($0.streak, now: .now) } ?? false
         let goal = DailyGoal(lessonsPerDay: profile?.dailyGoal ?? 1)
         let today = ProgressWriter.todayCount(records)
-        return HStack(spacing: 12) {
+        return HStack(alignment: .top, spacing: 12) {
             if broken { SleepingSarge(size: 84) } else { SargeByte(pose: .idle, size: 84) }
             VStack(alignment: .leading, spacing: 4) {
-                Text(broken ? "Sarge dozed off. Wake him with a lesson!" : streak == 0 ? "Ready, recruit?" : "\(streak)-day streak. Keep it up!").font(.headline)
+                Text(broken ? "Sarge dozed off. Wake him with a lesson!" : streak == 0 ? "Ready, recruit?" : "\(streak)-day streak. Keep it up!")
+                    .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
                 XPBar(to: goal.progress(lessonsToday: today), label: "Daily goal: \(min(today, goal.lessonsPerDay))/\(goal.lessonsPerDay) lessons")
-                Text("You're here: \(content.course.rungs[safe: rung]?.title ?? "Chat")").font(.subheadline).foregroundStyle(.secondary)
+                Text("You're here: \(content.course.rungs[safe: rung]?.title ?? "Chat")")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 if let next = content.planner.nextLesson(completed: completed, hasPro: pro.hasPro, startUnitId: profile?.startUnitId) {
                     Button("Start: \(next.1.title)") { playing = .init(unit: next.0, lesson: next.1) }
                         .buttonStyle(ChunkyButtonStyle()).padding(.top, 4)
                 }
             }
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         }
         .padding().background(.white, in: RoundedRectangle(cornerRadius: 20))
     }
@@ -75,13 +81,16 @@ struct HomePathView: View {
     @ViewBuilder private var reviewCard: some View {
         let refs = ReviewBuilder.steps(for: missed.map(\.ref), in: content.course).map(\.0)
         if !refs.isEmpty, let lesson = ReviewBuilder.lesson(for: refs, in: content.course) {
-            HStack {
+            HStack(alignment: .center, spacing: 10) {
                 Image(systemName: "arrow.counterclockwise.circle.fill").font(.title).foregroundStyle(Color.brandOrange)
-                VStack(alignment: .leading) {
-                    Text("Review mode").font(.headline)
-                    Text("\(missed.count) question\(missed.count == 1 ? "" : "s") to practice").font(.caption).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Review mode").font(.headline).fixedSize(horizontal: false, vertical: true)
+                    Text("\(missed.count) question\(missed.count == 1 ? "" : "s") to practice")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer()
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 Button("Practice") { reviewing = ReviewTarget(lesson: lesson, refs: refs) }.buttonStyle(.borderedProminent).tint(.brandOrange)
             }
             .padding().background(.white, in: RoundedRectangle(cornerRadius: 16))
@@ -101,13 +110,18 @@ struct HomePathView: View {
                 .font(.caption.weight(.heavy)).foregroundStyle(Color.brandOlive).frame(maxWidth: .infinity, alignment: .leading)
         }
         VStack(spacing: 14) {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Unit \(unit.number): \(unit.title)").font(.title3.weight(.heavy))
-                    Text(unit.blurb).font(.footnote).opacity(0.85)
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Unit \(unit.number): \(unit.title)")
+                        .font(.title3.weight(.heavy))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(unit.blurb)
+                        .font(.footnote)
+                        .opacity(0.85)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer()
-                if !unit.isFree && !pro.hasPro { Image(systemName: "lock.fill") }
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                if !unit.isFree && !pro.hasPro { Image(systemName: "lock.fill").padding(.top, 4) }
             }
             .padding().foregroundStyle(.white)
             .background(unit.isFree ? Color.brandTeal : Color.brandNavy, in: RoundedRectangle(cornerRadius: 16))
@@ -133,14 +147,19 @@ struct LessonNode: View {
     let lesson: Lesson
     let state: LessonState
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 8) {
             ZStack {
+                Circle().fill(Color.brandNavy.opacity(0.9)).frame(width: 72, height: 72).offset(y: 5)
                 Circle().fill(fill).frame(width: 72, height: 72)
                     .overlay(Circle().stroke(Color.brandNavy, lineWidth: 3))
-                    .shadow(color: .brandNavy.opacity(0.9), radius: 0, y: 5)
                 Image(systemName: icon).font(.title2.bold()).foregroundStyle(Color.brandNavy)
             }
-            Text(lesson.title).font(.caption.weight(.semibold)).frame(width: 130).multilineTextAlignment(.center)
+            Text(lesson.title)
+                .font(.caption.weight(.semibold))
+                .multilineTextAlignment(.center)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: 140)
         }
         .opacity(state == .locked ? 0.45 : 1)
         .accessibilityElement(children: .combine)

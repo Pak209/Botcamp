@@ -30,6 +30,7 @@ struct LessonPlayerView: View {
                 ScrollView {
                     StepView(step: lesson.steps[index], onResult: { ok in answered(index: index, correct: ok) })
                         .id("\(position)-\(index)")
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .disabled(feedback != nil)
                 }
@@ -51,9 +52,16 @@ struct LessonPlayerView: View {
 
     private func feedbackBar(_ f: Feedback) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label(f.correct ? "Nice!" : "Not quite. It'll come back at the end.", systemImage: f.correct ? "checkmark.circle.fill" : "arrow.uturn.backward.circle.fill")
-                .font(.headline)
-            if let e = f.explain { Text(e).font(.subheadline) }
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: f.correct ? "checkmark.circle.fill" : "arrow.uturn.backward.circle.fill")
+                Text(f.correct ? "Nice!" : "Not quite. It'll come back at the end.")
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            }
+            .font(.headline)
+            if let e = f.explain {
+                Text(e).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+            }
             Button("Continue") { advance() }.buttonStyle(ChunkyButtonStyle(color: f.correct ? .brandLime : .brandOrange))
         }
         .padding().frame(maxWidth: .infinity, alignment: .leading)
@@ -108,23 +116,37 @@ struct FinishView: View {
     let lesson: Lesson
     let done: () -> Void
     var body: some View {
-        VStack(spacing: 18) {
-            Spacer()
-            if let rank = result.rankUp { LevelUpBurst(rank: rank) }
-            else { SargeByte(pose: result.passed ? .cheer : .thinking, size: 160) }
-            Text(result.passed ? "Lesson complete!" : "Almost there").font(.largeTitle.weight(.heavy))
-            if result.passed {
-                Label("+\(result.xp) XP", systemImage: "bolt.fill").font(.title2.bold()).foregroundStyle(Color.brandTeal)
-                XPBar(from: Moments.rankProgress(xp: result.xpBefore) <= Moments.rankProgress(xp: result.xpBefore + result.xp) ? Moments.rankProgress(xp: result.xpBefore) : 0,
-                      to: Moments.rankProgress(xp: result.xpBefore + result.xp),
-                      label: "\(Rank.forXP(result.xpBefore + result.xp).title) · \(result.xpBefore + result.xp) XP")
-                    .padding(.horizontal, 30)
-            } else {
-                Text("You got \(result.firstTryCorrect) of \(lesson.gradedCount) on the first try. Pass mark is \(Int(lesson.passFraction * 100))%. Give it another go.")
-                    .multilineTextAlignment(.center)
+        GeometryReader { geo in
+            VStack(spacing: 16) {
+                ScrollView {
+                    VStack(spacing: 18) {
+                        Spacer(minLength: 0)
+                        if let rank = result.rankUp { LevelUpBurst(rank: rank) }
+                        else { SargeByte(pose: result.passed ? .cheer : .thinking, size: 160) }
+                        Text(result.passed ? "Lesson complete!" : "Almost there")
+                            .font(.largeTitle.weight(.heavy))
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if result.passed {
+                            Label("+\(result.xp) XP", systemImage: "bolt.fill").font(.title2.bold()).foregroundStyle(Color.brandTeal)
+                            XPBar(from: Moments.rankProgress(xp: result.xpBefore) <= Moments.rankProgress(xp: result.xpBefore + result.xp) ? Moments.rankProgress(xp: result.xpBefore) : 0,
+                                  to: Moments.rankProgress(xp: result.xpBefore + result.xp),
+                                  label: "\(Rank.forXP(result.xpBefore + result.xp).title) · \(result.xpBefore + result.xp) XP")
+                                .padding(.horizontal, 8)
+                        } else {
+                            Text("You got \(result.firstTryCorrect) of \(lesson.gradedCount) on the first try. Pass mark is \(Int(lesson.passFraction * 100))%. Give it another go.")
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: max(0, geo.size.height - 88))
+                    .padding(.horizontal)
+                }
+                Button("Continue", action: done).buttonStyle(ChunkyButtonStyle())
+                    .padding(.horizontal)
             }
-            Spacer()
-            Button("Continue", action: done).buttonStyle(ChunkyButtonStyle())
-        }.padding()
+            .padding(.vertical)
+        }
     }
 }

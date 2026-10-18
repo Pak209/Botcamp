@@ -15,11 +15,18 @@ struct HandoffStepView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack { SargeByte(pose: .thinking, size: 70); StepTitle(text: "Hands-on mission") }
-            Text(step.intro)
+            HStack(alignment: .center, spacing: 10) {
+                SargeByte(pose: .thinking, size: 70)
+                StepTitle(text: "Hands-on mission")
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            }
+            Text(step.intro).fixedSize(horizontal: false, vertical: true)
             Text(step.prompt)
-                .font(.system(.callout, design: .monospaced)).textSelection(.enabled)
-                .padding().frame(maxWidth: .infinity, alignment: .leading)
+                .font(.system(.callout, design: .monospaced))
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.white, in: RoundedRectangle(cornerRadius: 12))
             Text("Copy & open in your AI app, e.g.").font(.subheadline.bold())
             ForEach(AIApp.all) { app in
@@ -32,8 +39,15 @@ struct HandoffStepView: View {
                 Text("Back already? Check yourself:").font(.headline)
                 ForEach(step.checklist.indices, id: \.self) { i in
                     Button { ticked.formSymmetricDifference([i]) } label: {
-                        Label(step.checklist[i], systemImage: ticked.contains(i) ? "checkmark.square.fill" : "square")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Label {
+                            Text(step.checklist[i])
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        } icon: {
+                            Image(systemName: ticked.contains(i) ? "checkmark.square.fill" : "square")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }.foregroundStyle(Color.brandNavy)
                 }
                 Button("Mission complete") { onResult(true) }
@@ -41,7 +55,9 @@ struct HandoffStepView: View {
                     .disabled(!Grader.check(step, ticked: ticked))
             }
             Text("Botcamp isn't affiliated with these apps. Use whichever assistant you like.")
-                .font(.caption2).foregroundStyle(.secondary)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .onChange(of: scenePhase) { _, phase in if phase == .background { leftApp = true } }
     }

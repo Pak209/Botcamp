@@ -18,14 +18,15 @@ struct ProfileView: View {
                 Section {
                     HStack(spacing: 16) {
                         Image(rank.badgeAsset).resizable().scaledToFit().frame(width: 80, height: 80)
-                        VStack(alignment: .leading) {
-                            Text(rank.title).font(.title2.weight(.heavy))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(rank.title).font(.title2.weight(.heavy)).fixedSize(horizontal: false, vertical: true)
                             Text("\(xp) XP").foregroundStyle(.secondary)
                             if let next = Rank(rawValue: rank.rawValue + 1) {
                                 ProgressView(value: Double(xp - Rank.thresholds[rank.rawValue]), total: Double(Rank.thresholds[next.rawValue] - Rank.thresholds[rank.rawValue]))
-                                Text("Next: \(next.title)").font(.caption)
+                                Text("Next: \(next.title)").font(.caption).fixedSize(horizontal: false, vertical: true)
                             }
                         }
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 Section("Streak") {
@@ -57,7 +58,13 @@ struct ProfileView: View {
                 }
                 Section("Ranks") {
                     ForEach(Rank.allCases, id: \.self) { r in
-                        HStack { Image(r.badgeAsset).resizable().frame(width: 32, height: 32); Text(r.title); Spacer(); Text("\(Rank.thresholds[r.rawValue]) XP").foregroundStyle(.secondary) }
+                        HStack(alignment: .center, spacing: 8) {
+                            Image(r.badgeAsset).resizable().frame(width: 32, height: 32)
+                            Text(r.title)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                            Text("\(Rank.thresholds[r.rawValue]) XP").foregroundStyle(.secondary)
+                        }
                             .opacity(xp >= Rank.thresholds[r.rawValue] ? 1 : 0.4)
                     }
                 }

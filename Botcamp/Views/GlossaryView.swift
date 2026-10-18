@@ -12,10 +12,13 @@ struct GlossaryView: View {
         NavigationStack {
             List(terms, id: \.term) { t in
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t.term).font(.headline)
-                    Text(t.definition).font(.subheadline)
+                    Text(t.term).font(.headline).fixedSize(horizontal: false, vertical: true)
+                    Text(t.definition).font(.subheadline).fixedSize(horizontal: false, vertical: true)
                     if let u = content.course.unit(id: t.unitId) {
-                        Text("Learn it in Unit \(u.number): \(u.title)").font(.caption).foregroundStyle(Color.brandTeal)
+                        Text("Learn it in Unit \(u.number): \(u.title)")
+                            .font(.caption)
+                            .foregroundStyle(Color.brandTeal)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }.padding(.vertical, 4)
             }
